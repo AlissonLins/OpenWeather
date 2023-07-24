@@ -1,5 +1,5 @@
 // Variáveis e seleção de elementos
-const apiKey = "666276ae878f809873f960318a09c2ed".env
+const apiKey = "4e6fb66f8e6f06cb61a419190aee1c50".env
 const apiCountryURL = "https://flagsapi.com/BR/flat/64.png";
 const apiUnsplash = "https://source.unsplash.com/1600x900/?";
 
@@ -59,5 +59,3 @@ cityInput.addEventListener("keyup", (e) =>{
     showWeatherData(city);
   }
 })
-// 666276ae878f809873f960318a09c2ed
-//4e6fb66f8e6f06cb61a419190aee1c50
