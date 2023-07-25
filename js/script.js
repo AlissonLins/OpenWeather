@@ -1,5 +1,5 @@
 // Variáveis e seleção de elementos
-const apiKey = "4e6fb66f8e6f06cb61a419190aee1c50".env
+const apiKey = "4e6fb66f8e6f06cb61a419190aee1c50";
 const apiCountryURL = "https://flagsapi.com/BR/flat/64.png";
 const apiUnsplash = "https://source.unsplash.com/1600x900/?";
 
@@ -14,20 +14,54 @@ const countryElement = document.querySelector("#country");
 const humidityElement = document.querySelector("#humidity span");
 const windElement = document.querySelector("#wind span");
 
-const weatherContainer = document.querySelector("weather-data");
+const weatherContainer = document.querySelector(".weather-data");
 
-// Funções
-const getWeatherData = async(city) => {
+const errorMessageContainer = document.querySelector("#error-message");
+const loader = document.querySelector("#loader");
+
+const suggestionContainer = document.querySelector("#suggestions");
+const suggestionButtons = document.querySelectorAll("#suggestions button");
+
+// Loader
+const toggleLoader = () => {
+  loader.classList.toggle("hide");
+};
+
+const getWeatherData = async (city) => {
+  toggleLoader();
+
+
   const apiWeatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=pt_br`;
 
-    const res = await fetch(apiWeatherURL);
-    const data = await res.json();
+  const res = await fetch(apiWeatherURL);
+  const data = await res.json();
 
-    return data;
+  toggleLoader();
+
+  return data;
+};
+
+// Tratamento de erro 
+const showErrorMessage = () => {
+  errorMessageContainer.classList.remove("hide");
+};
+
+const hideInformation = () => {
+  errorMessageContainer.classList.add("hide");
+  weatherContainer.classList.add("hide");
+
+  suggestionContainer.classList.add("hide");
 };
 
 const showWeatherData = async (city) => {
+  hideInformation();
+
   const data = await getWeatherData(city);
+
+  if (data.cod === "404") {
+    showErrorMessage();
+    return;
+  }
 
   cityElement.innerText = data.name;
   tempElement.innerText = parseInt(data.main.temp);
@@ -40,17 +74,20 @@ const showWeatherData = async (city) => {
   humidityElement.innerText = `${data.main.humidity}%`;
   windElement.innerText = `${data.wind.speed}km/h`;
 
-  weatherContainer.classList.remove("hide");
+// Change bg image
+document.body.style.backgroundImage = `url("${apiUnsplash + encodeURIComponent(city)}")`;
+
+
+weatherContainer.classList.remove("hide");
 };
 
-// Eventos
-searchBtn.addEventListener("click", (e) => {
+searchBtn.addEventListener("click", async (e) => {
   e.preventDefault();
 
   const city = cityInput.value;
 
- showWeatherData(city);
-})
+  showWeatherData(city);
+});
 
 cityInput.addEventListener("keyup", (e) =>{
   if(e.code === "Enter"){
@@ -58,4 +95,13 @@ cityInput.addEventListener("keyup", (e) =>{
 
     showWeatherData(city);
   }
-})
+});
+
+// Sugestões
+suggestionButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const city = btn.getAttribute("id");
+
+    showWeatherData(city);
+  });
+});
